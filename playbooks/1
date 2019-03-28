@@ -1,0 +1,11 @@
+---
+- hosts: all
+  gather_facts: false
+  remote_user: root
+  tasks:
+    - name: ensure nginx is at the latest version
+      command: yum install nginx
+    - name: start nginx
+      service:
+          name: nginx
+          state: started

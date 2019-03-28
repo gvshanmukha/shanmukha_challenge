@@ -1,0 +1,33 @@
+---
+- hosts: all
+  gather_facts: false
+  remote_user: ec2-user
+  tasks:
+    - name: ensure nginx is at the latest version
+      command: sudo amazon-linux-extras install nginx1.12 -y
+    - name: start nginx
+      service:
+          name: nginx
+          state: started
+      become: yes
+    - name: copy the nginx config file and restart nginx
+      copy:
+        src: /etc/ansible/files/static_site.cfg
+        dest: /etc/nginx/sites-available/static_site.cfg
+      become: yes
+    - name: create symlink
+      file:
+        src: /etc/nginx/sites-available/static_site.cfg
+        dest: /etc/nginx/sites-enabled
+        state: link
+      become: yes
+    - name: copy the content of the web site
+      copy:
+        src: /etc/ansible/files/static-site-src/
+        dest: /home/ec2-user/static-site/
+    - name: restart nginx
+      service:
+        name: nginx
+        state: restarted
+      become: yes
+ 
